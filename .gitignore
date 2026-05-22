@@ -1,3 +1,17 @@
-node_modules
-.next
-.git
+# node_modules (フロントエンドの依存ライブラリは重いので除外)
+node_modules/
+.next/
+dist/
+build/
+
+# Pythonのキャッシュや生成物
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# 環境設定・個人情報
+.env
+.DS_Store
+
+# 今回作ったカスタムタスクのリスト（個人設定なのでGit管理から外す場合はここに入れる）
+.remote_linux_custom_tasks.json
