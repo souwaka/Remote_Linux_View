@@ -13,17 +13,21 @@ export default function Sidebar() {
   const handleHostAction = async (action: 'reboot' | 'shutdown') => {
     if (!currentHost) return;
     const confirmMsg = action === 'reboot' ? 'ホストを再起動しますか？' : 'ホストをシャットダウンしますか？';
-    
+
     if (confirm(confirmMsg)) {
       try {
-        const response = await fetch(`http://${currentHost.ip}:${currentHost.port}/host/${action}`, {
+        // パスを /api/system/${action} に修正しました
+        const response = await fetch(`http://${currentHost.ip}:${currentHost.port}/api/system/${action}`, {
           method: 'POST',
         });
         if (response.ok) {
           alert(`ホストへ ${action} 要求を送信しました。`);
+        } else {
+          alert(`操作に失敗しました。ステータス: ${response.status}`);
         }
       } catch (e) {
-        alert("操作に失敗しました。");
+        console.error("通信エラー:", e);
+        alert("操作に失敗しました。サーバーが起動しているか確認してください。");
       }
     }
   };

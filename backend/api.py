@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, Query
 import os
 import signal
 import json
+from commands import run_command
 from logic.monitor_cpu import get_cpu_stats
 from logic.monitor_resource import get_memory_stats, get_disk_stats
 from logic.monitor_tasks import get_running_processes
@@ -77,6 +78,16 @@ async def view_file_api(path: str = Query(..., description="ファイルパス")
             return {"content": content}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"読み込みエラー: {str(e)}")
+
+# --- システム制御用 ---
+@router.post("/api/system/{action}")
+async def system_action(action: str):
+    if action == "reboot":
+        return run_command(["sudo", "reboot"])
+    elif action == "shutdown":
+        return run_command(["sudo", "shutdown", "-h", "now"])
+    else:
+        raise HTTPException(status_code=400, detail="Invalid action")
 
 # --- CPU監視用 ---
 @router.get("/cpu-stats")
