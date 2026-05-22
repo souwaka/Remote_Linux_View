@@ -15,3 +15,6 @@ __pycache__/
 
 # 今回作ったカスタムタスクのリスト（個人設定なのでGit管理から外す場合はここに入れる）
 .remote_linux_custom_tasks.json
+
+# 巨大なバックアップファイルを除外
+*.tar.gz
