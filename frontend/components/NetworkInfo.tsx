@@ -9,7 +9,7 @@ export default function NetworkInfo() {
   const [ip, setIp] = useState('');
   const [status, setStatus] = useState<'checking' | 'online' | 'offline'>('checking');
 
-  // ヘルスチェック
+  // ヘルスチェック（従来通り8000番を監視）
   useEffect(() => {
     if (!currentHost) return;
 
@@ -36,13 +36,31 @@ export default function NetworkInfo() {
     return () => { isMounted = false; clearInterval(timer); };
   }, [currentHost]);
 
-  const handleAdd = () => {
-    if (name && ip) {
-      addHost({ id: Date.now().toString(), name, ip, port: 8000 });
-      setName('');
-      setIp('');
+  // 起動リクエスト（管理用9000番へ送信）
+  const handleConnect = async (host: { ip: string; name: string }) => {
+    try {
+      const res = await fetch(`http://${host.ip}:9000/restart-backend`, { method: 'POST' });
+      if (res.ok) {
+        alert(`${host.name} のバックエンドを起動リクエストしました。`);
+      }
+    } catch {
+      alert("管理サーバー(9000番)が見つかりません。Linux側の設定を確認してください。");
     }
   };
+
+  const handleAdd = () => {
+  if (name && ip) {
+    addHost({ 
+      id: Date.now().toString(), 
+      name, 
+      ip, 
+      port: 8000,
+      status: 'offline' // ここを追加！
+    });
+    setName('');
+    setIp('');
+  }
+};
 
   return (
     <div className="p-6 space-y-8 h-full overflow-y-auto bg-[#0b0c16]">
@@ -93,8 +111,18 @@ export default function NetworkInfo() {
                 </div>
                 {currentHost?.id === host.id && <span className="text-[10px] bg-blue-600 text-white px-2 rounded-full">ACTIVE</span>}
               </div>
+              
               <div className="flex gap-2">
                 <button onClick={() => setCurrentHost(host)} className="flex-1 py-1.5 rounded-lg text-xs font-bold bg-gray-800 hover:bg-blue-600 transition-colors">切替</button>
+                
+                {/* 起動用接続ボタン */}
+                <button 
+                  onClick={() => handleConnect(host)}
+                  className="px-3 py-1.5 rounded-lg text-xs font-bold bg-green-900/30 text-green-400 border border-green-900 hover:bg-green-600 hover:text-white transition-all"
+                >
+                  接続
+                </button>
+                
                 <button onClick={() => removeHost(host.id)} className="p-1.5 bg-gray-800 text-gray-500 hover:text-red-400 rounded-lg">🗑️</button>
               </div>
             </div>
