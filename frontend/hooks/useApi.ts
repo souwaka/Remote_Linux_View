@@ -3,20 +3,25 @@ import { useCallback, useState } from 'react';
 
 export const useApi = () => {
   const { currentHost } = useHost();
-  const [isError, setIsError] = useState(false); // 接続状態を管理
+  const [isError, setIsError] = useState(false);
 
-  const fetchFromHost = useCallback(async (endpoint: string) => {
+  // signal を受け取れるようにし、依存を IP と Port に固定
+  const fetchFromHost = useCallback(async (endpoint: string, signal?: AbortSignal) => {
     try {
       const url = `http://${currentHost.ip}:${currentHost.port}${endpoint}`;
-      const response = await fetch(url);
-      if (!response.ok) throw new Error();
-      setIsError(false); // 成功！
-      return response.json();
-    } catch (e) {
-      setIsError(true); // 失敗！
+      const response = await fetch(url, { signal });
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      
+      setIsError(false);
+      return await response.json();
+    } catch (e: any) {
+      if (e.name !== 'AbortError') {
+        setIsError(true);
+        console.error(`API Fetch Error [${endpoint}]:`, e);
+      }
       throw e;
     }
-  }, [currentHost]);
+  }, [currentHost.ip, currentHost.port]);
 
   return { fetchFromHost, isError };
 };
