@@ -36,6 +36,7 @@ export default function TerminalView({ tabId, hostIp, hostPort }: TerminalViewPr
       fontFamily: 'Courier New, Courier, monospace',
       theme: { background: '#000000', foreground: '#ffffff', cursor: '#4ade80' }
     });
+    
     const fitAddon = new FitAddon();
     term.loadAddon(fitAddon);
     term.open(terminalRef.current);
@@ -43,14 +44,18 @@ export default function TerminalView({ tabId, hostIp, hostPort }: TerminalViewPr
     termInstance.current = term;
     fitAddonRef.current = fitAddon;
 
+    // スクロールバーを表示するためのスタイル強制
+    const viewport = terminalRef.current.querySelector('.xterm-viewport') as HTMLElement;
+    if (viewport) viewport.style.overflowY = 'scroll';
+
     const safeFit = () => {
-      requestAnimationFrame(() => {
-        if (termInstance.current && !((termInstance.current as any)._core._disposed)) {
-          try { fitAddonRef.current?.fit(); } catch (e) {}
-        }
-      });
+      if (termInstance.current && !((termInstance.current as any)._core._disposed)) {
+        try { fitAddonRef.current?.fit(); } catch (e) {}
+      }
     };
 
+    // レンダリング完了を待ってから初期fitを実行
+    const timer = setTimeout(safeFit, 300);
     window.addEventListener('resize', safeFit);
 
     const socket = io(`http://${hostIp}:${hostPort}`, {
@@ -71,18 +76,14 @@ export default function TerminalView({ tabId, hostIp, hostPort }: TerminalViewPr
       }
     });
 
-    // --- 入力処理の最適化 ---
     term.onData((data) => {
       if (!socketRef.current?.connected) return;
 
-      // 【高速化】印字可能な文字は即座に画面へエコーバック
-      // これにより、通信を待たずに文字が入力されているように見える
       if (data.charCodeAt(0) >= 32 && data !== '\x7f') {
         term.write(data);
         inputBuffer.current += data;
       }
 
-      // 送信ロジック
       if (data === '\r') {
         term.write('\r\n');
         socketRef.current.emit('terminal_input', { data: inputBuffer.current + '\r' });
@@ -97,9 +98,8 @@ export default function TerminalView({ tabId, hostIp, hostPort }: TerminalViewPr
       }
     });
 
-    safeFit();
-
     return () => {
+      clearTimeout(timer);
       window.removeEventListener('resize', safeFit);
       socket.disconnect();
       if (termInstance.current) {
@@ -112,7 +112,7 @@ export default function TerminalView({ tabId, hostIp, hostPort }: TerminalViewPr
   return (
     <div
       ref={terminalRef}
-      className="w-full h-full p-2 bg-black overflow-hidden"
+      className="w-full h-full min-h-[400px] bg-black overflow-hidden p-2"
       translate="no"
       data-lpignore="true"
     />
