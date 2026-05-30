@@ -3,7 +3,8 @@
 import { createContext, useContext, useState, ReactNode } from 'react';
 
 // 現在のViewの種類を定義
-export type ViewType = 'network' | 'status' | 'cpu' | 'task' | 'terminal' | 'file';
+export type ViewType = 'network' | 'resource' | 'cpu' | 'task' | 'terminal' | 'file' | 'ai';
+// （※他のProviderのロジックはそのまま残してね！）
 
 const DashboardContext = createContext<{
   currentView: ViewType;

@@ -5,18 +5,18 @@ import { useDashboard, ViewType } from '../hooks/useDashboard';
 import { useHost } from '../context/HostContext';
 
 export default function Sidebar() {
+  // 💡 創さんのオリジナルの通り changeView をそのまま使用！
   const { currentView, changeView } = useDashboard();
   const { currentHost } = useHost();
   const [isSessionOpen, setIsSessionOpen] = useState(false);
 
-  // ホスト操作用の共通アクション関数
+  // ホスト操作用の共通アクション関数（完全維持）
   const handleHostAction = async (action: 'reboot' | 'shutdown') => {
     if (!currentHost) return;
     const confirmMsg = action === 'reboot' ? 'ホストを再起動しますか？' : 'ホストをシャットダウンしますか？';
 
     if (confirm(confirmMsg)) {
       try {
-        // パスを /api/system/${action} に修正しました
         const response = await fetch(`http://${currentHost.ip}:${currentHost.port}/api/system/${action}`, {
           method: 'POST',
         });
@@ -32,6 +32,8 @@ export default function Sidebar() {
     }
   };
 
+  // 💡 創さんのデザイン＆カラーシステムの中に 'ai' を追加！
+  // 色はAIらしいスマートなパープル系の配色（bg-purple-950 border-purple-800 text-purple-200）にしてみたよ！
   const menuItems: { id: ViewType; label: string; icon: string; color: string }[] = [
     { id: 'network', label: 'ネットワーク情報', icon: '🌐', color: 'bg-blue-900 border-blue-700 text-blue-200' },
     { id: 'resource', label: 'リソース状況', icon: '📋', color: 'bg-indigo-900 border-indigo-700 text-indigo-200' },
@@ -39,11 +41,12 @@ export default function Sidebar() {
     { id: 'task', label: 'タスク管理', icon: '⚙️', color: 'bg-emerald-950 border-emerald-800 text-emerald-200' },
     { id: 'terminal', label: 'ターミナル起動', icon: '💻', color: 'bg-green-700 border-green-600 text-white' },
     { id: 'file', label: 'ファイル管理', icon: '📁', color: 'bg-amber-600 border-amber-500 text-white' },
+    { id: 'ai', label: 'AIアシスタント', icon: '🤖', color: 'bg-purple-950 border-purple-800 text-purple-200' }, // ← 🤖 ココに追加！
   ];
 
   return (
     <aside className="w-64 flex flex-col gap-2 shrink-0 h-full overflow-hidden">
-      {/* ヘッダー */}
+      {/* ヘッダー（完全維持） */}
       <div className="flex items-center justify-between px-4 py-3 bg-[#161930] rounded-lg border border-gray-800/80 mb-1 shrink-0 shadow-md">
         <div className="flex items-center gap-2">
           <span className="text-blue-400 text-sm">■</span>
@@ -52,12 +55,12 @@ export default function Sidebar() {
         <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
       </div>
 
-      {/* メニューリスト */}
+      {/* メニューリスト（完全維持） */}
       <div className="flex-1 flex flex-col gap-2 overflow-y-auto pr-1">
         {menuItems.map((item) => (
           <button
             key={item.id}
-            onClick={() => changeView(item.id)}
+            onClick={() => changeView(item.id)} // 💡 創さんの関数をそのまま実行！
             className={`w-full py-2.5 px-4 rounded-lg font-bold text-sm transition-all duration-150 border-b-2 flex items-center gap-3 active:translate-y-0.5 active:border-b-0 shrink-0 ${
               currentView === item.id
                 ? `${item.color} shadow-lg ring-1 ring-white/20`
@@ -69,7 +72,7 @@ export default function Sidebar() {
           </button>
         ))}
 
-        {/* セッション管理 */}
+        {/* セッション管理（完全維持） */}
         <div className="mt-4 border-t border-gray-800/60 pt-4 shrink-0">
           <button
             onClick={() => setIsSessionOpen(!isSessionOpen)}

@@ -30,11 +30,20 @@ export default function TerminalView({ tabId, hostIp, hostPort }: TerminalViewPr
   useEffect(() => {
     if (!isAllowed || !isDOMReady || !terminalRef.current) return;
 
+    // ★配色を最適化したテーマ設定
     const term = new Terminal({
       cursorBlink: true,
       fontSize: 14,
       fontFamily: 'Courier New, Courier, monospace',
-      theme: { background: '#000000', foreground: '#ffffff', cursor: '#4ade80' }
+      theme: { 
+        background: '#0d1117',      // ダークモードの背景に馴染ませる
+        foreground: '#e4e4e4',      // 文字は目に優しいライトグレー
+        cursor: '#ffffff',          // カーソルは白でクッキリ
+        selectionBackground: '#ffffff33', // 選択範囲は半透明の白
+        black: '#0d1117',
+        green: '#a0a0a0',          // 緑を抑えてグレー調に
+        brightGreen: '#ffffff',     // ハイライトは白
+      }
     });
     
     const fitAddon = new FitAddon();
@@ -44,7 +53,6 @@ export default function TerminalView({ tabId, hostIp, hostPort }: TerminalViewPr
     termInstance.current = term;
     fitAddonRef.current = fitAddon;
 
-    // スクロールバーを表示するためのスタイル強制
     const viewport = terminalRef.current.querySelector('.xterm-viewport') as HTMLElement;
     if (viewport) viewport.style.overflowY = 'scroll';
 
@@ -54,11 +62,11 @@ export default function TerminalView({ tabId, hostIp, hostPort }: TerminalViewPr
       }
     };
 
-    // レンダリング完了を待ってから初期fitを実行
     const timer = setTimeout(safeFit, 300);
     window.addEventListener('resize', safeFit);
 
-    const socket = io(`http://${hostIp}:${hostPort}`, {
+    // ★修正済みの接続先URL生成
+    const socket = io(`http://${hostIp}`, {
       query: { tabId: tabId },
       transports: ['websocket'],
       upgrade: false
@@ -112,7 +120,7 @@ export default function TerminalView({ tabId, hostIp, hostPort }: TerminalViewPr
   return (
     <div
       ref={terminalRef}
-      className="w-full h-full min-h-[400px] bg-black overflow-hidden p-2"
+      className="w-full h-full min-h-[400px] bg-[#0d1117] overflow-hidden p-2"
       translate="no"
       data-lpignore="true"
     />

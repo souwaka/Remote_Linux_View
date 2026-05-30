@@ -8,7 +8,11 @@
     "start": "next start -H 0.0.0.0 -p 3000"
   },
   "dependencies": {
+    "@ai-sdk/react": "^3.0.195",
+    "@nanostores/react": "github:ai/react",
+    "ai": "^6.0.193",
     "next": "16.2.6",
+    "ollama-ai-provider": "^1.2.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "socket.io-client": "^4.8.3",

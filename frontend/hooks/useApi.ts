@@ -8,7 +8,7 @@ export const useApi = () => {
   // signal を受け取れるようにし、依存を IP と Port に固定
   const fetchFromHost = useCallback(async (endpoint: string, signal?: AbortSignal) => {
     try {
-      const url = `http://${currentHost.ip}:${currentHost.port}${endpoint}`;
+      const url = `http://${currentHost.ip}${endpoint}`;
       const response = await fetch(url, { signal });
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       
