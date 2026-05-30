@@ -30,7 +30,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+<<<<<<< HEAD
 # 元のAPIルーターと、新設したファイル管理用ルーターをそれぞれマウント
+=======
+# 元のAPIルーターとターミナル用のマウント
+>>>>>>> 215d74ddb818deb2537130a90430af00a8861c98
 app.include_router(router)
 app.include_router(file_router)  # 💡 ここで新しいエンドポイントを一括有効化！
 app.mount("/socket.io", sio_app)
